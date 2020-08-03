@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper
+		PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wikipicki.service.fran.FranDAO">
+
+	<resultMap id="franResultMap" type="fran">
+		<result property="franNo"	 			column="fran_no"		 	jdbcType="NUMERIC" />	<!-- 가맹점 번호 -->
+		<result property="comRegNo"				column="com_reg_no" 		jdbcType="VARCHAR" />	<!-- 사업자 등록번호 -->	
+		<result property="franCost"				column="fran_cost" 			jdbcType="NUMERIC" />	<!-- 가맹점 사용가격 -->
+		<result property="franName" 			column="fran_name" 			jdbcType="VARCHAR" />	<!-- 가맹점 이름 -->
+		<result property="franAddress" 			column="fran_address" 		jdbcType="VARCHAR" />	<!-- 가맹점 주소 -->
+		<result property="franStatus" 			column="service_status" 	jdbcType="VARCHAR" />	<!-- 가맹점 영업중 폐업중 -->
+		<result property="partnerName" 			column="partner_name"		jdbcType="VARCHAR" />	<!-- 프랜차이즈 이름 -->
+		<result property="franLeave"			column="leave_reason" 		jdbcType="VARCHAR" />	<!-- 탈퇴사유 -->
+		<result property="franState" 			column="req_status" 		jdbcType="VARCHAR" />	<!-- 처리상태 처리중 처리완료 -->
+		<result property="franTotalSeat" 		column="fran_total_seat" 	jdbcType="NUMERIC" />	<!-- 가맹점 총좌석수 -->
+		<result property="franRegDate" 			column="fran_reg_date" 		jdbcType="VARCHAR" />		<!-- 가맹점 가입날짜 -->
+		<result property="franLeaveDate" 		column="fran_leave_date" 	jdbcType="VARCHAR" />		<!-- 가맹점 탈퇴날짜 -->
+		<result property="userId" 				column="user_id" 			jdbcType="VARCHAR" />	<!-- 가맹회원 아이디  -->
+		<result property="cpu" 					column="cpu" 				jdbcType="VARCHAR" />	<!-- cpu   -->
+		<result property="gpu" 					column="gpu" 				jdbcType="VARCHAR" />	<!-- gpu   -->
+		<result property="ram" 					column="ram" 				jdbcType="VARCHAR" />	<!-- ram   -->
+		<result property="monitor" 				column="monitor" 			jdbcType="VARCHAR" />	<!-- monitor   -->
+		<result property="keyboard" 			column="keyboard" 			jdbcType="VARCHAR" />	<!-- keyboard   -->
+		<result property="mouse" 				column="mouse" 				jdbcType="VARCHAR" />	<!-- mouse   -->
+		<result property="latitude" 			column="latitude" 			jdbcType="DECIMAL" />	<!-- y축 위도   -->
+		<result property="longitude" 			column="longitude" 			jdbcType="DECIMAL" />	<!-- x축 경도   -->
+		
+	</resultMap>
+
+ 	<!-- 가맹점 등록  -->
+	<insert id="addFran">
+	 	INSERT 
+		INTO fran(	
+					user_id
+				,	com_reg_no
+				,	fran_name
+				,	fran_cost
+				,	fran_address
+				,	fran_reg_date
+				,	fran_total_seat
+				,	service_status
+				,	partner_name
+				,	latitude
+				,	longitude
+				
+		) VALUES(
+					#{userId}
+				,	#{comRegNo}
+				,	#{franName}
+				,	#{franCost}
+				,	#{franAddress}
+				,	CURDATE()
+				,	#{franTotalSeat}
+				,	#{franStatus}
+				,	#{partnerName}
+				,	#{latitude}
+				,	#{longitude}
+		)
+	 </insert>
+	
+	 <!-- 가맹점 상세보기  -->
+	 <select id="getFran" parameterType="fran" resultMap="franResultMap">
+		SELECT *
+			FROM fran 
+			LEFT JOIN
+			fran_img 
+			ON fran.fran_no = fran_img.fran_no 
+			LEFT JOIN
+			product
+			ON fran.fran_no = product.fran_no
+			where fran.fran_no = #{franNo}
+				
+	 </select>
+	 
+	 
+	 
+	  <!-- 가맹점 목록 리스트  -->
+	  <select id="getListFran" parameterType="search" resultMap="franResultMap">
+	 	SELECT fr.fran_no, fr.fran_name, fr.fran_reg_date, fr.service_status, img.img_name 
+			FROM fran AS fr
+			LEFT JOIN
+			fran_img AS img
+			ON fr.fran_no = img.fran_no
+			
+			<if test="searchType == 'regDate'">
+				AND fran_reg_date = 'regDate'
+			</if>
+			<if test="searchType == 'Service'">
+				AND service_status = 'Service'
+			</if>
+			<if test="keyword != ''">
+				AND fr.fran_name LIKE CONCAT('%', #{keyword}, '%')
+			</if>
+			ORDER 
+			BY fr.fran_no DESC
+			<if test="page != 0">
+			LIMIT	#{search.listSize}
+			OFFSET #{search.startList}		
+			</if>	
+		 </select>
+	 
+	 <!-- 가맹점 수정  --> 	 
+	 <update id="updateFran" parameterType="fran" >
+	 	UPDATE	FRAN
+		SET		
+			fran_name		 = #{franName}
+		,	fran_cost		 = #{franCost}
+		,	fran_Address	 = #{franAddress}
+		,	fran_total_seat	 = #{franTotalSeat}
+		,	partner_name 	 = #{partnerName}
+	
+		WHERE 	fran_no = #{franNo}
+	 </update>
+	 
+	 
+	
+	  <!-- 가맹점 등록 신청 리스트  --> 
+ 
+	 <select id="getListAddFran" parameterType="fran" resultMap="franResultMap">
+			SELECT 	fran_no
+			,	fran_name
+			,	user_id
+			,	DATE_FORMAT(fran_reg_date, '%Y-%m-%d') fran_reg_date
+			,	req_status
+			
+		FROM 	fran 
+
+	 </select>	 
+	 
+	  
+	  
+	  <!-- 가맹점 탈퇴 신청 -->
+	   <update id="leaveFran" parameterType="fran" >
+	 	UPDATE	FRAN
+		SET		
+			service_status	= 'f'
+		,	leave_reason 	= #{franLeave}
+		,   fran_leave_date	= CURDATE()
+	
+		WHERE 	fran_no = #{franNo}
+	 </update>
+	    
+	  <!-- 가맹점 탈퇴 리스트  --> 
+	 <select id="getListLeaveFran" parameterType="fran" resultMap="franResultMap">
+		SELECT 
+				  fran.fran_no
+				, fran.fran_name
+				, fran.fran_leave_date
+				, fran.req_status
+				, fran_img.img_name
+			FROM	 fran
+			LEFT JOIN	fran_img
+			ON 	fran.fran_no = fran_img.fran_no 
+		WHERE service_status = 'f'
+	 
+	 </select>
+	 
+	  <!-- 가맹점 pc사양보기  --> 
+	 <select id="getFranPcInfoData" parameterType="fran" resultMap="franResultMap">
+	 
+	 SELECT 
+	 		  cpu
+	 		, gpu
+	 		, ram
+	 		, monitor
+	 		, keyboard
+	 		, mouse
+			FROM fran
+			WHERE fran_no = #{franNo}
+	 
+	 </select>
+
+	 <!--  체크 벨리데이션  -->
+
+	<select id = "checkValidaition" parameterType="fran">
+	SELECT 
+			  fran_no
+			, com_reg_no
+	FROM fran
+	WHERE user_id = #{userId}
+	</select>
+
+	<!-- 가맹점 정보 메인지도에 보내기 -->
+	<select id="getFranInfo" resultType="fran" resultMap="franResultMap">
+	 SELECT *
+  		FROM fran
+	 </select>
+	 
+	 <!-- 가맹점 승인 -->
+	  <update id="arFran" parameterType="fran" >
+	 	UPDATE	FRAN
+		SET	
+			req_status	= #{franState}
+			
+		WHERE 	fran_no = #{franNo}
+	 </update>
+	 
+	 <!-- 가맹점 반려 -->
+	 
+	 
+	 
+	
+	
+	<!-- 가맹점 -->	 
+	 
+</mapper>

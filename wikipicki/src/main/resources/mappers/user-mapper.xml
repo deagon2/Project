@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+		PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wikipicki.service.user.UserDAO">
+
+	<resultMap id="userResultMap" type="user">
+		<result property="userId" 			column="user_id" 		jdbcType="VARCHAR"/>
+		<result property="type"				column="user_type" 		jdbcType="CHAR" />
+		<result property="status" 			column="user_status" 	jdbcType="CHAR" />
+		<result property="marketInfo" 		column="agreement" 		jdbcType="CHAR" />
+		<result property="snsCon" 			column="sns" 			jdbcType="CHAR" />
+		<result property="grade" 			column="grade" 			jdbcType="VARCHAR" />
+		<result property="gradeImg" 		column="grade_img" 		jdbcType="CHAR" />
+		<result property="nickName" 		column="nickname" 		jdbcType="VARCHAR" />
+		<result property="userName" 		column="user_name" 		jdbcType="VARCHAR" />
+		<result property="password" 		column="user_password" 	jdbcType="VARCHAR" />
+		<result property="regDate" 			column="reg_date" 		jdbcType="DATE"  />
+		<result property="leaveDate" 		column="leave_date" 	jdbcType="DATE" />
+		<result property="profileImg" 		column="profile_img"	jdbcType="CHAR" />
+		<result property="phone" 			column="phone"	 		jdbcType="CHAR" />
+		<result property="kakaoId" 			column="kakao_id" 		jdbcType="CHAR" />
+		<result property="point" 			column="current_point" 	jdbcType="NUMERIC" />
+		<result property="birthDate" 		column="birth"	 		jdbcType="DATE" />
+		<result property="comName" 			column="company" 		jdbcType="VARCHAR" />
+		<result property="ceo" 				column="ceo"	 		jdbcType="VARCHAR" />
+		<result property="repPhone" 		column="ceo_phone" 		jdbcType="CHAR" />
+		
+	</resultMap>
+	
+<!-- mySQL : INSERT -->
+
+<!-- 회원가입 -->
+<insert id="addUser" parameterType="user">
+	INSERT
+	INTO 	user(
+					user_id
+				, 	user_type
+				, 	user_status
+				, 	agreement
+				, 	sns
+				, 	grade
+				, 	grade_img
+				, 	nickname
+				, 	user_name
+				, 	user_password
+				, 	reg_date
+				, 	leave_date
+				, 	profile_img
+				, 	phone
+				, 	kakao_id
+				, 	current_point
+				, 	birth
+				, 	company
+				, 	ceo
+				, 	ceo_phone
+	) VALUES(
+					#{userId}
+				, 	#{type:CHAR}
+				, 	'T'
+				, 	#{marketInfo:CHAR}
+				, 	#{snsCon:CHAR}
+				, 	#{grade:VARCHAR}
+				, 	#{gradeImg:CHAR}
+				, 	#{nickName:VARCHAR}
+				, 	#{userName:VARCHAR}
+				, 	#{password:VARCHAR}
+				, 	CURDATE()
+				, 	null
+				, 	#{profileImg:CHAR}
+				, 	#{phone:CHAR}
+				, 	null
+				, 	'0'
+				, 	#{birthDate:DATE}
+				, 	#{comName:VARCHAR}
+				, 	#{ceo:VARCHAR}
+				, 	#{repPhone:CHAR}
+	)
+</insert>
+	 
+
+<!-- mySQL : UPDATE -->
+
+<!-- 회원 정보수정, 내정보수정, 비밀번호변경 -->
+<update id = "updateUser" parameterType="user">
+	UPDATE 	user
+	SET		grade = #{grade}
+		, 	grade_img = #{gradeImg}
+		, 	user_status = #{status}
+		, 	nickname = #{nickName}
+		, 	user_password = #{password}
+		, 	sns = #{snsCon}
+		, 	agreement = #{marketInfo}
+		, 	ceo = #{ceo}
+		, 	ceo_phone = #{repPhone}
+		, 	profile_img = #{profileImg}
+	WHERE 	user_id = #{userId}
+</update>
+
+
+
+<!-- mySQL : SELECT -->
+
+<!-- 아이디찾기 -->
+<select id = "getUserId" parameterType="user" resultMap="userResultMap">
+	SELECT 	user_id
+	FROM 	user
+	WHERE 	user_name = #{userName} 
+		AND phone = #{phone}
+</select>
+
+<!-- 비밀번호 변경하기 -->
+<update id = "updatePassword" parameterType="user">
+	UPDATE 	user
+	SET 	user_password = #{password}
+	WHERE	 user_id = #{userId}
+</update>
+
+<!-- 아이디 중복체크 -->
+<select id = "checkDuplication" parameterType="user">
+	SELECT 	user_id
+	FROM 	user
+	WHERE 	user_id =#{userId}
+</select>
+
+<!-- 로그인 -->
+<select id = "login" parameterType="user" resultMap="userResultMap">
+	SELECT 	user_id
+		, 	user_type
+		, 	user_status
+		, 	grade
+		, 	grade_img
+		,	user_name
+		, 	nickname
+		, 	user_password
+		, 	current_point
+	FROM 	user
+	WHERE 	user_id = #{userId}
+</select>
+
+<!-- 관리자가 일반/가맹회원정보보기 -->
+<select id = "getUser" parameterType="user" resultMap="userResultMap">
+	SELECT	user_id	
+		, 	user_type
+		, 	user_status
+		, 	agreement
+		, 	sns
+		, 	grade
+		, 	grade_img
+		, 	nickname
+		, 	user_name
+		, 	user_password
+		, 	reg_date
+		, 	leave_date
+		, 	profile_img
+		, 	phone
+		, 	kakao_id
+		, 	current_point
+		, 	birth
+		, 	company
+		, 	ceo
+		, 	ceo_phone
+	FROM 	user
+	WHERE 	user_id = #{value}
+</select>
+
+<!-- 일반/가맹회원의 내정보보기 -->
+<select id = "getMypage" parameterType="string" resultMap="userResultMap">
+	SELECT	user_id	
+		, 	user_type
+		, 	user_status
+		, 	agreement
+		, 	sns
+		, 	grade
+		, 	grade_img
+		, 	nickname
+		, 	user_name
+		, 	user_password
+		, 	reg_date
+		, 	leave_date
+		, 	profile_img
+		, 	phone
+		, 	kakao_id
+		, 	current_point
+		, 	birth
+		, 	company
+		, 	ceo
+		, 	ceo_phone
+	FROM 	user
+	WHERE 	user_id = #{value}
+</select>
+
+<!-- 일반회원 리스트보기 -->
+<select id = "getUserList" parameterType="search" resultMap="userResultMap">
+
+	  	SELECT 	profile_img
+			, 	user_id
+			, 	user_name
+			, 	grade
+			, 	user_status
+			, 	current_point
+		FROM 	user
+		<where>
+				user_type = 'U'
+			<if test="searchType == 'user_id' and keyword != '' ">
+				AND user_id LIKE CONCAT('%',#{keyword},'%')
+			</if>
+			<if test="searchType == 'user_name' and keyword != '' ">
+				AND user_name LIKE CONCAT('%',#{keyword},'%')
+			</if>
+			<if test="searchType == 'grade' and keyword != '' ">
+				AND grade LIKE CONCAT('%',#{keyword},'%')
+			</if>
+			<if test="searchType == 'user_status' and keyword != '' ">
+				AND user_status LIKE CONCAT('%',#{keyword},'%')
+			</if>
+			<if test="searchType == 'user_type' and keyword != '' ">
+				AND user_type LIKE CONCAT('%',#{keyword},'%')
+			</if>								
+		</where>
+			ORDER BY user_id ASC
+		<if test="page!=0">
+		LIMIT #{listSize}
+		OFFSET #{startList}
+		</if>
+</select>
+
+
+<!--  가맹회원 리스트보기-->
+<select id = "getFranUserList" parameterType="search" resultMap="userResultMap">
+	  	SELECT 	u.profile_img
+			, 	u.user_id
+			, 	u.ceo
+			, 	u.company
+			, 	u.user_status
+			, 	f.com_reg_no
+		FROM 	user u
+			,	fran f
+		<where>
+				u.user_id = f.user_id AND u.user_type = 'F'
+			<if test="searchType == 0 and keyword != '' ">
+				AND u.user_id LIKE CONCAT('%',#{keyword},'%')
+			</if>
+			<if test="searchType == 1 and keyword != '' ">
+				AND u.ceo LIKE CONCAT('%',#{keyword},'%')
+			</if>
+			<if test="searchType == 2 and keyword != '' ">
+				AND u.company LIKE CONCAT('%',#{keyword},'%')
+			</if>
+			<if test="searchType == 3 and keyword != '' ">
+				AND u.user_status LIKE CONCAT('%',#{keyword},'%')
+			</if>
+			<if test="searchType == 4 and keyword != '' ">
+				AND f.com_reg_no LIKE CONCAT('%',#{keyword},'%')
+			</if>								
+		</where>
+			ORDER BY user_id ASC
+		<if test="page!=0">
+		LIMIT #{search.listSize}
+		OFFSET #{search.startList}
+		</if>
+</select>
+
+
+<!-- 카카오 연동 업데이트 -->
+
+<update id = "updateUserkakao" parameterType="user">
+	UPDATE 	user
+	SET		sns = #{snsCon}
+		, 	kakao_id = #{kakaoId}
+	WHERE 	user_id = #{userId}
+</update>
+
+
+<!-- 카카오로그인 -->
+<select id = "loginkakao" parameterType="user" resultMap="userResultMap">
+	SELECT 	user_id
+		, 	user_type
+		, 	user_status
+		, 	grade
+		, 	grade_img
+		, 	nickname
+		, 	user_password
+		, 	current_point
+	FROM 	user
+	WHERE 	kakao_id = #{kakaoId}
+</select>
+	 
+</mapper>

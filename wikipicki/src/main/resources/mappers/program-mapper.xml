@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper
+		PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wikipicki.service.program.ProgramDAO">
+
+	<resultMap id="ProgramSelectMap" type="program">
+		<result property="franSeatRegNo" column="FRAN_SEAT_REG_NO"  jdbcType="INTEGER"/>
+		<result property="seatNo"		 column="SEAT_NO"		jdbcType="INTEGER"/>
+		<result property="status"		 column="STATUS"			jdbcType="VARCHAR"/>
+		<result property="franNo"	     column="FRAN_NO"		jdbcType="INTEGER"/>
+		<result property="nowSeat"	     column="NOWSEAT"		jdbcType="INTEGER"/>
+		
+			
+	</resultMap>
+	
+ 
+	<insert id="addSeat" parameterType= "program"  >
+	 	INSERT 
+		INTO seat_no( fran_no, status, seat_no)
+		VALUES(  #{franNo}, Default, #{seatNo} );  
+	</insert>
+	
+	<select id="getSeat" resultType="program" >
+	SELECT fran_no as franNo, count(seat_no)-1 as nowSeat
+	FROM seat_no
+	WHERE Status = 't' and fran_no
+    Group by fran_no ;
+   
+	</select>
+	
+	<select id= "getFranSeat" resultType="program" >
+	SELECT 
+	seat_no as seatNo ,status
+	FROM seat_no 
+	where fran_no = #{franNo}; 
+	</select>
+	
+	<update id="updateFreeBoard" >
+	UPDATE BOARD 
+	SET TITLE = #{title}, CONTENT = #{content} ,IMG_FILE = #{imgFile} , FILE = #{file}
+	WHERE BOARD_TYPE = 'free' and BOARD_NO = #{boardNo} 
+	</update>
+	 
+	
+</mapper>

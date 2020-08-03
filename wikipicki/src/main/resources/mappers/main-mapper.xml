@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper
+		PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wikipicki.service.main.MainDAO">
+
+	<resultMap id="FreeBoardSelectMap" type="freeBoard">
+		<result property="boardNo"		column="BOARD_NO"		jdbcType="INTEGER"/>
+		<result property="userId"		column="USER_ID"		jdbcType="VARCHAR"/>
+		<result property="title"		column="TITLE"			jdbcType="VARCHAR"/>
+		<result property="content"		column="CONTENT"		jdbcType="VARCHAR"/>
+		<result property="regDate"		column="REG_DATE"		jdbcType="VARCHAR"/>
+		<result property="hit"			column="HIT"			jdbcType="INTEGER"/>
+		<result property="recnt"		column="RECNT"			jdbcType="INTEGER"/>
+		<result property="file"			column="FILE"			jdbcType="VARCHAR"/>	
+		<result property="imgFile"		column="IMG_FILE"		jdbcType="VARCHAR"/>
+		<result property="writer.nickName" 		column="NICKNAME"			jdbcType="VARCHAR"/>
+		<result property="userImg.profileImg" 	column="PROFILE_IMG"		jdbcType="VARCHAR"/>
+		
+			
+	</resultMap>
+	
+	<resultMap id="CommentSelectMap" type="comment">
+		<result property="commentNo"	column="COMMENT_NO"		jdbcType="INTEGER"/>
+		<result property="boardNo"		column="BOARD_NO"		jdbcType="INTEGER"/>
+		<result property="parentNo"		column="PARENT_NO"		jdbcType="VARCHAR"/>
+		<result property="userId"		column="USER_ID"		jdbcType="VARCHAR"/>
+		<result property="content"		column="CONTENT"		jdbcType="VARCHAR"/>
+		<result property="regDate"		column="REG_DATE"		jdbcType="VARCHAR"/>
+		<result property="writer.nickName" 		column="NICKNAME"			jdbcType="VARCHAR"/>
+		<result property="userImg.profileImg" 	column="PROFILE_IMG"		jdbcType="VARCHAR"/>
+	</resultMap>	
+	
+ 
+	<insert id="addFreeBoard" parameterType="freeBoard">
+	 	INSERT 
+		INTO board( user_id, board_type,    title,       content,         reg_date,        hit,       file,     img_file  )
+		VALUES( #{userId},     'FREE',    #{title},    #{content} ,  CURRENT_TIMESTAMP,  default,   #{file},   #{imgFile} );  
+	</insert>
+	
+	<select id="getFreeBoard" parameterType="freeBoard" resultMap="FreeBoardSelectMap">
+	SELECT
+	d.BOARD_NO,
+	d.TITLE,
+    d.CONTENT,
+    d.REG_DATE,
+    d.IMG_FILE,
+    u.NICKNAME
+	FROM BOARD d
+	left join User u on u.user_id = d.user_id
+	WHERE board_type ='free' AND board_no = #{boardNo}
+	</select>
+	
+	<update id="updateFreeBoard" parameterType="freeBoard">
+	UPDATE BOARD 
+	SET TITLE = #{title}, CONTENT = #{content} ,IMG_FILE = #{imgFile} , FILE = #{file}
+	WHERE BOARD_TYPE = 'free' and BOARD_NO = #{boardNo} 
+	</update>
+	 
+	 
+	<select id="getFreeBoardList" resultType="freeBoard" resultMap="FreeBoardSelectMap">
+	SELECT
+	d.BOARD_NO,
+	d.TITLE,
+    d.CONTENT,
+    d.REG_DATE,
+    d.HIT,
+    u.NICKNAME,
+    u.PROFILE_IMG,
+					(SELECT 
+					 count(*)
+					 FROM COMMENT c
+					 WHERE d.board_no = c.board_no) RECNT
+	FROM BOARD d
+	left join User u on u.user_id = d.user_id
+		<trim prefix="WHERE" prefixOverrides="AND|OR">
+			<if test="searchType=='title' and keyword != null and keyword != '' ">
+				AND board_type = 'free' AND TITLE like CONCAT('%', #{keyword}, '%')
+			</if>
+			<if test="searchType=='content' and keyword != null and keyword != '' ">
+				AND board_type = 'free' AND CONTENT like CONCAT('%', #{keyword}, '%')
+			</if>
+			<if test="searchType=='writer.nickName' and keyword != null and keyword != '' ">
+				AND board_type = 'free' AND NICKNAME like CONCAT('%', #{keyword}, '%')
+			</if>	
+		</trim>
+	ORDER BY BOARD_NO DESC
+    LIMIT #{startList}, #{listSize}
+	</select>
+	
+	<select id="getFreeBoardListAll" resultType="INT">
+		SELECT 
+		count(*) as listCnt
+        FROM board d         
+		left join User u on u.user_id = d.user_id
+			<trim prefix="WHERE" prefixOverrides="AND|OR">
+				<if test="keyword != null and keyword != '' ">
+			<if test="searchType=='title'">
+				AND board_type = 'free' AND TITLE like CONCAT('%', #{keyword}, '%')
+			</if>
+			<if test="searchType=='content'">
+				AND board_type = 'free' AND CONTENT like CONCAT('%', #{keyword}, '%')
+			</if>
+			<if test="searchType=='nickName'">
+				AND board_type = 'free' AND NICKNAME = #{keyword}
+			</if>
+      		</if>
+		</trim>	
+	</select>
+	
+	
+	<delete id="deleteFreeBoard" parameterType="freeBoard" >
+	DELETE FROM board WHERE board_no = #{boardNo}
+	</delete>
+	 
+	<!--  리스트 구할떄 같이 구해오기로함.
+	<select id="getFreeBoardComment" parameterType="INT" resultMap="FreeBoardSelectMap">
+	SELECT COUNT(*)
+	FROM COMMENT
+	WHERE board_no = #{boardNo}
+	</select> -->
+	
+	<update id="updateHit" parameterType="INT">
+	UPDATE BOARD 
+		SET HIT = HIT + 1
+		WHERE board_no = #{boardNo}
+	</update>
+	
+<!--============================댓글==================================  -->	
+	<insert id="addComment" parameterType="comment">
+	INSERT INTO
+    COMMENT ( board_no,   user_id,    parent_no,       reg_date,         content)
+    VALUES( #{boardNo},  #{userId},  null,  CURRENT_TIMESTAMP,   #{content});
+	</insert>
+	
+	<update id="updateComment" parameterType="comment">
+	UPDATE COMMENT 
+	SET CONTENT = #{content}
+	WHERE USER_ID = #{userId} and COMMENT_NO = #{commentNo} 
+	</update>
+	
+	<delete id="deleteComment" parameterType="comment" >
+	DELETE FROM COMMENT
+	 WHERE COMMENT_NO = #{commentNo}
+	</delete>
+	
+	<select id="getCommentList"  parameterType="INT" resultMap="CommentSelectMap">
+	SELECT 
+    c.user_id,
+    u.nickname,
+    u.profile_img,
+    c.comment_no, 
+    c.board_no, 
+    c.parent_no, 
+    c.reg_date,
+    c.content
+	FROM COMMENT C 
+	left join user u on u.user_id  = c.user_id  
+    WHERE c.user_id = u.user_id and c.board_no = #{board_no}
+    ORDER BY reg_date DESC
+	
+	</select>
+	
+	
+	
+	
+	
+	
+	
+	
+</mapper>
