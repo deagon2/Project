@@ -69,29 +69,5 @@
 		<property name="maxInMemorySize" value="10000000" />
 	</bean>
 	
- 	<mvc:interceptors>
-   		<mvc:interceptor>
-			<mvc:mapping path="/**/"/>
-
-			<mvc:exclude-mapping path="/user/login" />
-			<mvc:exclude-mapping path="/user/getUserId" />
-			<mvc:exclude-mapping path="/user/getPassword" />
-			<mvc:exclude-mapping path="/user/updatePassword" />
-			<mvc:exclude-mapping path="/user/selectJoin" />
-			<mvc:exclude-mapping path="/user/addUser" />
-			<mvc:exclude-mapping path="/user/addFranUser" />
-			<mvc:exclude-mapping path="/user/**" />
-			
-			<mvc:exclude-mapping path="/coupon/couponPage" />
-			
-			<mvc:exclude-mapping path="/event/eventPage" />
-			<mvc:exclude-mapping path="/event/getEventList" />
-			<mvc:exclude-mapping path="/event/getEvent" />
-			
-			<mvc:exclude-mapping path="/resources/**" />
-			
-			<bean class="com.wikipicki.common.interceptor.LoginCheckInterceptor" />
-   		</mvc:interceptor>
-   	</mvc:interceptors>
 	
 </beans>

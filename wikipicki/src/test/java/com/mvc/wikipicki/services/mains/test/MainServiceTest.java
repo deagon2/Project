@@ -1,8 +1,5 @@
 package com.mvc.wikipicki.services.mains.test;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 //import javax.websocket.PongMessage;
 
@@ -15,12 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import com.wikipicki.common.Pagination;
-import com.wikipicki.common.Search;
 import com.wikipicki.service.domain.Comment;
 import com.wikipicki.service.domain.FreeBoard;
-import com.wikipicki.service.domain.Point;
-import com.wikipicki.service.domain.Program;
 import com.wikipicki.service.main.MainDAO;
 import com.wikipicki.service.program.ProgramDAO;
 
@@ -41,7 +34,6 @@ public class MainServiceTest {
 	
 	@Autowired
 	private MainDAO mainDAO;
-	private ProgramDAO programDAO;
 	
 	@Test
 	public void testAddFreeBoard() throws Exception {

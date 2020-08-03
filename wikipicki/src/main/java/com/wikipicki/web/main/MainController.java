@@ -152,13 +152,6 @@ public class MainController {
 	}
 
 
-	//¸Ê
-	@RequestMapping(value = "getFranMap", method = RequestMethod.GET)
-	public String getFranMap(Model model) throws Exception {
-		return "/main/getFranMap.jsp";
-	}
-	
-	
 	//ÀÚ¸®¿¹¾à
 	@RequestMapping(value = "seat", method = RequestMethod.GET)
 	public String addSeat (Model model) throws Exception {

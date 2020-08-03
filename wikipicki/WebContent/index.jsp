@@ -23,12 +23,6 @@
 	.customoverlay .body {display:block;text-align:center;background:#fff;margin-right:35px;padding:5px 5px;font-size:10px;font-weight:bold;}
  	.customoverlay:after {content:'';position:absolute;margin-left:-12px;left:50%;bottom:-12px;width:22px;height:12px;background:url('https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/vertex_white.png')}
 
-
-	.custom_zoomcontrol {position:absolute;top:50px;right:10px;width:36px;height:80px;overflow:hidden;z-index:1;background-color:#f5f5f5;} 
-	.custom_zoomcontrol span {display:block;width:36px;height:40px;text-align:center;cursor:pointer;}     
-	.custom_zoomcontrol span img {width:15px;height:15px;padding:12px 0;border:none;}             
-	.custom_zoomcontrol span:first-child{border-bottom:1px solid #bfbfbf;}            	
-
 	.seat {width:15px;height:15px;}
 	.seat {font-size: 13px;background-color: #555555;color: white;border: 1px solid rgba(255, 0, 0, 0.6);}
     .clicked {background-color:red;color:white;}
@@ -304,14 +298,6 @@ $(document).ready(function(){
   </div>
 </div>
 
-<div class="map_wrap">
-    <div id="map" style="width:100%;height:100%;position:relative;overflow:hidden;"></div> 
-
-<div class="custom_zoomcontrol radius_border"> 
-        <span onclick="zoomIn()"><img src="https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/ico_plus.png" alt="확대"></span>  
-        <span onclick="zoomOut()"><img src="https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/ico_minus.png" alt="축소"></span>
-    </div>
-</div>
 
 
 </body>
